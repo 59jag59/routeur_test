@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Présentation avec cadres</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        /* Cadre supérieur */
+        .frame-top {
+            width: 100%;
+            background-color: #f0f0f0;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Conteneur pour les cadres du bas */
+        .frame-bottom {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Cadres côte à côte */
+        .frame {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .frame h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Style des sliders et des textes */
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            font-weight: bold;
+        }
+
+        .value-display {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        .result {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cadre supérieur pour les paramètres -->
+        <div class="frame-top">
+            <h1>Paramètres</h1>
+            <div class="slider-container">
+                <label class="slider-label" for="solarProduction">Production solaire (W):</label>
+                <input type="range" id="solarProduction" min="0" max="5000" value="2500" step="100" oninput="updateValues()">
+                <span class="value-display" id="solarValue">2500</span> W
+            </div>
+            <div class="slider-container">
+                <label class="slider-label" for="thresholdPw">Seuil PW (%):</label>
+                <input type="range" id="thresholdPw" min="-500" max="500" value="0" step="10" oninput="updateValues()">
+                <span class="value-display" id="thresholdValue">0</span> W
+            </div>
+            <div class="slider-container">
+                <label class="slider-label" for="homeConsumption">Consommation maison (W):</label>
+                <input type="range" id="homeConsumption" min="0" max="5000" value="2500" step="100" oninput="updateValues()">
+                <span class="value-display" id="consumptionValue">2500</span> W
+            </div>
+        </div>
+
+        <!-- Deux cadres côte à côte pour les résultats -->
+        <div class="frame-bottom">
+            <div class="frame">
+                <h3>Sans Routeur</h3>
+                <p class="result">Puissance compteur : <span id="netPower">0</span> W</p>
+                <p id="netStatus">Soutire à l'EDF</p>
+            </div>
+            <div class="frame">
+                <h3>Avec Routeur</h3>
+                <p class="result">Routage chauffe-eau optimisé : <span id="optimizedWaterRouting">0</span> W</p>
+                <p class="result">Injection réseau : <span id="injectionPower">0</span> W</p>
+                <p>État : <span id="optimizedStatus">--</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateValues() {
+            // Récupérer les valeurs des sliders
+            const solarProduction = parseInt(document.getElementById("solarProduction").value, 10);
+            const thresholdPw = parseInt(document.getElementById("thresholdPw").value, 10);
+            const homeConsumption = parseInt(document.getElementById("homeConsumption").value, 10);
+
+            // Mettre à jour les valeurs affichées
+            document.getElementById("solarValue").innerText = solarProduction;
+            document.getElementById("thresholdValue").innerText = thresholdPw;
+            document.getElementById("consumptionValue").innerText = homeConsumption;
+
+            // Calculs pour la puissance nette
+            const netPower = solarProduction - homeConsumption;
+            document.getElementById("netPower").innerText = -netPower;
+            document.getElementById("netStatus").innerText = netPower > 0 ? "Injecte dans le réseau" : "Soutire à l'EDF";
+
+            // Calculs pour le cadre "Avec Routeur"
+            const availablePower = solarProduction - homeConsumption;
+            const optimizedWaterRouting = Math.max(0, availablePower - thresholdPw);
+            const injectionPower = 0 ;//Math.max(0, solarProduction - homeConsumption);
+
+            // Mise à jour des résultats
+            document.getElementById("optimizedWaterRouting").innerText = optimizedWaterRouting;
+            document.getElementById("injectionPower").innerText = injectionPower;
+            document.getElementById("optimizedStatus").innerText = injectionPower > 0 ? "Injecte dans le réseau" : "Pas d'injection";
+        }
+
+        // Initialisation
+        updateValues();
+    </script>
+</body>
+</html>
