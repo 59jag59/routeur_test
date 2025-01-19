@@ -75,12 +75,12 @@
         <!-- Cadre supérieur pour les paramètres -->
         <div class="frame-top">
             <h1>Paramètres</h1>
-            <h6> example pour un chauffeau de  2000W</h6>
+            <h6>Exemple pour un chauffe-eau modifiable</h6>
             <div class="slider-container">
                 <label class="slider-label" for="homeConsumption">Consommation maison (W):</label>
                 <input type="range" id="homeConsumption" min="0" max="5000" value="2500" step="100" oninput="updateValues()">
                 <span class="value-display" id="consumptionValue">2500</span> W
-          </div>
+            </div>
             <div class="slider-container">
                 <label class="slider-label" for="solarProduction">Production solaire (W):</label>
                 <input type="range" id="solarProduction" min="0" max="5000" value="2500" step="100" oninput="updateValues()">
@@ -90,6 +90,11 @@
                 <label class="slider-label" for="thresholdPw">Seuil PW (%):</label>
                 <input type="range" id="thresholdPw" min="-500" max="500" value="0" step="10" oninput="updateValues()">
                 <span class="value-display" id="thresholdValue">0</span> W
+            </div>
+            <div class="slider-container">
+                <label class="slider-label" for="waterHeaterPower">Puissance chauffe-eau (W):</label>
+                <input type="range" id="waterHeaterPower" min="500" max="3000" value="2000" step="100" oninput="updateValues()">
+                <span class="value-display" id="heaterPowerValue">2000</span> W
             </div>
         </div>
 
@@ -107,43 +112,42 @@
                 <p>État : <span id="optimizedStatus">--</span></p>
             </div>
         </div>
-        <h6> 59jag</h6>
+        <h6>59jag</h6>
     </div>
 
     <script>
         function updateValues() {
-    // Récupérer les valeurs des sliders
-    const solarProduction = parseInt(document.getElementById("solarProduction")?.value, 10) || 0;
-    const thresholdPw = parseInt(document.getElementById("thresholdPw")?.value, 10) || 0;
-    const homeConsumption = parseInt(document.getElementById("homeConsumption")?.value, 10) || 0;
+            // Récupérer les valeurs des sliders
+            const solarProduction = parseInt(document.getElementById("solarProduction")?.value, 10) || 0;
+            const thresholdPw = parseInt(document.getElementById("thresholdPw")?.value, 10) || 0;
+            const homeConsumption = parseInt(document.getElementById("homeConsumption")?.value, 10) || 0;
+            const waterHeaterPower = parseInt(document.getElementById("waterHeaterPower")?.value, 10) || 0;
 
-    // Mettre à jour les valeurs affichées
-    document.getElementById("solarValue").innerText = solarProduction;
-    document.getElementById("thresholdValue").innerText = thresholdPw;
-    document.getElementById("consumptionValue").innerText = homeConsumption;
+            // Mettre à jour les valeurs affichées
+            document.getElementById("solarValue").innerText = solarProduction;
+            document.getElementById("thresholdValue").innerText = thresholdPw;
+            document.getElementById("consumptionValue").innerText = homeConsumption;
+            document.getElementById("heaterPowerValue").innerText = waterHeaterPower;
 
-    // Calculs pour la puissance nette
-    const netPower = solarProduction - homeConsumption;
-    document.getElementById("netPower").innerText = -netPower;
-    document.getElementById("netStatus").innerText = netPower > 0 ? "Injecte dans le réseau" : "Soutire à l'EDF";
+            // Calculs pour la puissance nette
+            const netPower = solarProduction - homeConsumption;
+            document.getElementById("netPower").innerText = -netPower;
+            document.getElementById("netStatus").innerText = netPower > 0 ? "Injecte dans le réseau" : "Soutire à l'EDF";
 
-    // Calculs pour le cadre "Avec Routeur"
-    const availablePower = solarProduction - homeConsumption;
-    const optimizedWaterRouting = Math.max(0, availablePower + thresholdPw);
-    const limitedRouting = Math.min(optimizedWaterRouting, 2000);
-    const adjustedInjection = -netPower + limitedRouting;
+            // Calculs pour le cadre "Avec Routeur"
+            const availablePower = solarProduction - homeConsumption;
+            const optimizedWaterRouting = Math.max(0, availablePower + thresholdPw);
+            const limitedRouting = Math.min(optimizedWaterRouting, waterHeaterPower);
+            const adjustedInjection = -netPower + limitedRouting;
 
-    // Mise à jour des résultats
-    document.getElementById("optimizedWaterRouting").innerText = limitedRouting;
-    document.getElementById("injectionPower").innerText = adjustedInjection;
-    document.getElementById("optimizedStatus").innerText = adjustedInjection < 0 ? "Injecte dans le réseau" : adjustedInjection ==0 ? "Neutre" :"Soutire à l'EDF";
-}
+            // Mise à jour des résultats
+            document.getElementById("optimizedWaterRouting").innerText = limitedRouting;
+            document.getElementById("injectionPower").innerText = adjustedInjection;
+            document.getElementById("optimizedStatus").innerText = adjustedInjection < 0 ? "Injecte dans le réseau" : adjustedInjection === 0 ? "Neutre" : "Soutire à l'EDF";
+        }
 
-// Initialisation
-updateValues();
-
+        // Initialisation
+        updateValues();
     </script>
 </body>
 </html>
-
-
